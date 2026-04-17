@@ -1,0 +1,10 @@
+node_modules/
+__MACOSX/
+*.zip
+*.log
+nul
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env

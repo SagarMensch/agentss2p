@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pymongo
+openai
+python-dotenv
+pydantic>=2.9.0

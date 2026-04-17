@@ -1,0 +1,1785 @@
+
+
+Agentic AI in Source-to-Pay: Use-Case Catalogue,
+Controls, and a Pilot-to-Scale Roadmap
+Executive summary
+Agentic AI refers to AI systems that do more than generate text: they can pursue objectives through multi-
+step planning, tool use, and action-taking in an environment (e.g., enterprise applications) with appropriate
+feedback loops and guardrails. Recent research characterizes agentic AI as shifting AI from “conversation
+partners” to “active collaborators” that can perceive context, reason, plan, act, and coordinate (including
+multi-agent setups), while surfacing new risks such as “hallucination in action,” infinite loops, and prompt-
+injection exposure as systems start executing real operations. 
+In S2P, agentic AI’s value proposition is not just faster drafting/summarization; it is orchestrated autonomy
+across cross-functional, exception-heavy workflows (intake → sourcing → contracting → procure-to-pay →
+supplier performance/risk/analytics). Industry definitions of S2P suites emphasize an integrated lifecycle
+across sourcing, contracting, requesting, procuring, receiving, and paying—typically modular, SaaS, and
+ERP-agnostic—where   data   flows   across   upstream/downstream   artifacts   like   contracts,   POs,   receipts,
+invoices, and payments. 
+Across the S2P subprocesses you listed, the best near-term “agentic” pilots tend to cluster around high-
+volume coordination and exception handling where (a) inputs are already digitally available, (b) decisions
+can be bounded by policy, and (c) human approvals remain explicit. Examples supported by vendor
+documentation   include   conversational   procurement   task   execution   and   navigation   (e.g.,   “complete
+procurement tasks 50% faster” claims for embedded assistants), automated RFx bid analysis/supplier
+response   summarization,   requisition-to-PO   assistance,   invoice   extraction/matching   with   touchless
+processing targets, and process copilots that combine knowledge models, tool plans, and structured
+outputs for orchestration and analytics. 
+However, strong governance is essential. Gartner warns that over 40% of agentic AI projects may be
+canceled by end of 2027, citing drivers such as escalating costs, unclear business value, and inadequate
+risk   controls—and   highlights   “agent   washing”   (rebranding   assistants/RPA/chatbots   as   agents   without
+substantive autonomy). This makes disciplined use-case selection, measurable KPIs, and auditable controls
+non-negotiable. 
+The   roadmap   in   this   report   prioritizes:   (1)   foundational   readiness   (data,   identity,   process   telemetry,
+controls), (2) pilots that deliver measurable cycle-time/cost/accuracy improvements while keeping approvals
+intact, and (3) progressive scaling toward multi-agent orchestration and closed-loop optimization only after
+controls and auditability mature.
+1
+2
+3
+4
+5
+1
+
+Assumptions and scope
+This report assumes a cross-industry enterprise context with: (a) an existing ERP and/or S2P/P2P stack, (b)
+meaningful transaction volumes (POs/invoices/sourcing events) and supplier base, and (c) standard control
+requirements (segregation of duties, audit trails, privacy/security). These assumptions align with how S2P
+suites are positioned as modular, ERP-agnostic solutions that integrate across the full process and require
+robust APIs for adjacent systems. 
+“Agentic AI” here is scoped to enterprise-grade agentic systems: LLM-orchestrated or hybrid agents that
+can plan and use tools/APIs within predefined guardrails, rather than unconstrained autonomous systems.
+This matches research emphasis on controllable orchestration and explicit guardrails as a pragmatic
+response to reliability and safety risks when agents can take real actions. 
+Maturity levels used in tables: -  Research: primarily academic/experimental; limited enterprise proof. -
+Prototype:   vendor-announced,   preview,   or   early   adopter   deployments;   partial   proof.   -  Production:
+generally available capabilities and/or multiple referenced deployments.
+Implementation complexity is scored Low / Medium / High based on integration depth, data readiness
+requirements, and control/audit workload, consistent with analyst cautions that integrating agents into
+legacy systems can be technically complex and may require workflow redesign. 
+What agentic AI is and what it can do in enterprise workflows
+Academic and industry literature converges on a practical definition: agentic AI systems combine an LLM
+“controller” with memory, planning/reflection, and tools/actions to pursue goals over multiple steps, often
+with   feedback   and   possibly   with   multiple   collaborating   agents.   A   2026   architecture/taxonomy   paper
+decomposes agents into components like Perception/Brain/Planning/Action/Tool Use/Collaboration and
+explicitly highlights risks (prompt injection, hallucination in action) that become more severe when agents
+execute operations rather than just produce text. 
+Related foundational work illustrates key mechanisms that matter for S2P: - Reasoning + acting loops (e.g.,
+ReAct)   show   how   interleaving   reasoning   traces   with   actions/tool   calls   can   reduce   hallucinations   by
+grounding decisions in external sources and making trajectories more interpretable. 
+-  Tool learning and tool selection (e.g., Toolformer) emphasizes that models can learn when and how to
+call external APIs (calculator/search/etc.), a close analogue of calling ERP/S2P APIs for validation and
+execution. 
+-  Reflection and episodic memory (e.g., Reflexion) demonstrates improving agent behavior over repeated
+trials by maintaining reflective memory, which maps to continuous improvement in exception handling
+(e.g., invoice mismatch resolution patterns). 
+A conceptual taxonomy further distinguishes “AI agents” (often modular, task-specific automation with
+tools)   from   “agentic   AI”   (more   coordinated   autonomy   with   persistent   memory   and   multi-agent
+collaboration), providing a useful lens for procurement leaders: many “AI features” in procurement are
+assistant-like; true agentic behavior typically requires orchestration, policy constraints, statefulness, and
+traceability. 
+6
+7
+8
+9
+10
+11
+12
+13
+2
+
+For procurement specifically, industry research indicates both strong interest and early-stage deployment
+realities. The Hackett Group reports that nearly two-thirds of procurement executives expect GenAI to
+fundamentally change operations within five years and notes early pilots and embedded features in areas
+like PO processing, spend analytics, and e-procurement—while also emphasizing data quality and risk
+concerns. 
+Source-to-pay process model and reference architecture for agents
+An authoritative market definition frames S2P as an integrated solution set to source, contract, request,
+procure, receive, and pay for goods/services across the enterprise, typically SaaS and modular, with data
+flowing across related artifacts (contract ↔ PO ↔ receipts ↔ invoices ↔ payments).    This is the
+architectural precondition for agentic AI: agents need  a coherent process graph  and  consistent data
+semantics to act reliably.
+S2P subprocess flow
+flowchart LR
+  A[Intake / Demand] --> B[Supplier Discovery]
+  B --> C[RFx]
+  C --> D[Negotiation]
+  D --> E[Contracting]
+  E --> F[Requisition / Procurement]
+  F --> G[Purchase Order]
+  G --> H[Receipt / Service Entry]
+  H --> I[Invoice Processing]
+  I --> J[Payment]
+  K[Supplier Management] --- B
+  K --- E
+  L[Compliance & Controls] --- A
+  L --- J
+  M[Analytics & Process Mining] --- A
+  M --- J
+This aligns with common S2P-suite feature expectations that include sourcing, CLM, procure-to-pay through
+“OK to pay,” supplier collaboration, spend analytics, intake management, supplier risk, and payments. 
+Reference architecture for agentic AI in S2P
+A pragmatic enterprise pattern is a guardrailed orchestration layer that sits alongside (not “inside”) core
+systems: -  Agent  control  plane: policies, tool allow-lists, approval thresholds, logging, and evaluation/
+monitoring—reflecting   research   emphasis   on   controllable   orchestration   and   the   need   to   prevent
+“hallucination in action.” 
+-   Tool  adapters: ERP/S2P/CLM APIs, document ingestion (IDP), supplier-risk/ESG feeds, and e-invoicing
+networks. S2P suites themselves highlight the need for robust API access for real-time integration with
+adjacent systems. 
+-  Process telemetry: event logs and process intelligence; “process copilots” are increasingly described as
+14
+15
+6
+6
+16
+17
+3
+
+LLM-orchestrated agentic systems that plan tool usage over a predefined tool set and can generate
+structured outputs for orchestration. 
+-  Human-in-the-loop checkpoints: consistent with both governance guidance and the EU’s emphasis on
+human oversight for higher-risk applications. 
+Subprocess use cases and vendor maturity
+Vendor and platform snapshot
+The table below anchors example vendors and the “evidence trail” for agentic capabilities (official docs,
+analyst definitions, or documented releases). It does not imply endorsement; it highlights where public
+documentation supports specific agentic patterns.
+Vendor / platform
+Coverage
+focus in S2P
+Public evidence of agentic/AI
+capability
+Notes on maturity
+signals
+SAP
+S2P suite +
+embedded
+assistant
+Next‑gen S2P positioning with
+embedded assistant and “bid
+analysis agent,” intake mgmt
+availability, and incremental
+delivery through 2026–2027;
+assistant claims 50% faster
+task execution/search in
+procurement workflows. 
+Mix of production
++ near-term
+releases (explicit
+GA timing for some
+capabilities). 
+Oracle
+ERP/SCM +
+embedded AI
+agents
+“AI agents embedded” in
+Fusion apps; examples include
+a Payables AI Agent for invoice
+classification/extraction, policy/
+tax checks, matching to POs/
+receipts; sourcing “agentic
+apps” for negotiation
+monitoring and
+recommendations; agent
+studio for customization. 
+Production +
+configurable (with
+roadmap
+disclaimers typical
+for vendor forward-
+looking
+statements). 
+ServiceNow
+Intake/
+orchestration
+for indirect
+procurement
+Procurement Service
+Management positions a
+“single engagement layer
+across systems” and use of AI
+to eliminate manual work and
+speed processes. 
+Often used as an 
+orchestration
+front door rather
+than a full S2P
+backbone. 
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+27
+4
+
+Vendor / platform
+Coverage
+focus in S2P
+Public evidence of agentic/AI
+capability
+Notes on maturity
+signals
+Celonis
+Analytics/
+process
+intelligence +
+orchestration
+Process Copilots described as
+LLM-orchestrated “agentic
+systems” that build execution
+plans over predefined tools;
+release notes show structured
+outputs and embedding
+copilots into orchestration
+steps plus authenticated API
+calls to external services. 
+Strong for 
+auditability via
+process context
+and “data-to-action”
+orchestration
+patterns. 
+UiPath
+P2P
+automation +
+agentic
+orchestration
+P2P page describes “agentic
+automation,” connectors for
+Coupa/SAP/Oracle, and
+multiple P2P case-study
+metrics (e.g., invoice volumes
+and touchless rates). 
+Often production in
+execution
+automation, with
+agentic layer
+evolving. 
+CoupaS2P suite
+Public reporting describes
+“agentic AI tools” such as
+supplier inquiry response
+agent, natural-language
+vendor search, plain-language
+→ cost/scoring formulas, and
+document-to-request
+transformation in sourcing
+workflows. 
+Evidence of 
+production
+releases, but some
+details may be
+vendor-/journalist-
+mediated due to
+limited direct
+access. 
+Ivalua
+S2P platform +
+orchestration
+Positions “policy-driven
+behaviors” across sourcing/
+contracting/supplier mgmt via
+an intelligent virtual assistant
+on an orchestration backbone
+(triggering actions, escalating
+when needed). 
+Suggests 
+orchestrated
+autonomy
+conceptually;
+validate per-
+module GA status
+in your
+environment. 
+Icertis
+CLM + contract
+intelligence
+Positions “agentic AI across the
+full contract lifecycle,”
+including automation of
+drafting/redlining and guided
+workflows; CLM includes
+negotiation guidance via
+playbooks/fallback positions. 
+CLM is relatively
+mature for 
+document
+intelligence;
+deeper autonomy
+depends on
+integration and
+controls. 
+28
+18
+18
+29
+30
+30
+31
+32
+33
+34
+35
+36
+37
+3839
+5
+
+Vendor / platform
+Coverage
+focus in S2P
+Public evidence of agentic/AI
+capability
+Notes on maturity
+signals
+Pactum
+Negotiation
+automation
+Case-series abstract describes
+AI automating high-volume,
+low-value negotiations with
+efficiency gains/cost savings
+but relationship-management
+challenges; also indicates
+piloting by named enterprises. 
+Negotiation
+autonomy remains 
+higher-risk and
+governance-
+sensitive despite
+real pilots. 
+EcoVadis
+Supplier ESG
+assessments
+API described as linking
+systems to sustainability
+insights and enabling real-time
+access to supplier ratings/
+updates. 
+Typically
+production as data
+feed; agentic value
+comes from
+orchestration and
+decisioning. 
+entity["company","Dun
+& Bradstreet","business
+data provider"]
+Supplier
+validation and
+risk
+Supplier risk offerings
+emphasize monitoring risk
+factors; SAP help content
+describes using D&B supplier
+data during supplier workflows
+via integration. 
+Production as risk/
+identity data;
+agentic use
+depends on policy
+and action controls.
+ABBYY
+Invoice/
+document
+ingestion (IDP)
+Defines IDP as broader than
+OCR, using ML/NLP to extract/
+understand documents; claims
+IDP supports a digital trail/logs
+that aid transparency and
+compliance. 
+IDP is relatively
+mature; agentic
+layers can drive
+exception routing
+and remediation. 
+S2P subprocess-by-subprocess agentic AI catalogue
+The table below provides at least one concrete agentic AI use case per subprocess (often more), along with
+benefits,   required   inputs,   integration   touchpoints,   complexity,   maturity,   and   example   vendors/case
+references.
+Legend: Complexity = Low/Med/High. Maturity = Research/Prototype/Production.
+40
+41
+42
+43
+44
+44
+4546
+47
+4849
+6
+
+Subprocess
+Agentic AI use
+cases (specific)
+Expected
+benefits
+Required
+inputs/data
+Integration
+points (typical)
+ComplexityMaturity
+Example vendors /
+sources
+Sourcing
+1) Category
+opportunity agent:
+propose sourcing
+waves from spend,
+contract expiries,
+risk signals. 2)
+Cost-model agent:
+translate plain-
+language
+objectives into
+scoring and cost
+formulas for
+optimization
+events. 
+Faster event
+setup;
+improved cost
+modeling
+consistency;
+more
+standardized
+evaluation. 
+Spend cube,
+taxonomy,
+contract
+metadata,
+supplier
+performance/
+risk, category
+strategies. 
+Sourcing
+module APIs,
+analytics lake/
+warehouse,
+contract
+repository,
+supplier
+master. 
+Med
+Prototype→Production
+Coupa feature
+reporting (cost/
+scoring formulas). 
+Supplier
+discovery
+1) “Supplier scout”
+agent: NL query →
+candidate
+suppliers; enrich
+with risk/ESG;
+generate shortlists
+with rationale. 2)
+Supplier inquiry
+agent: respond to
+routine supplier
+questions from
+portal context. 
+Lower search
+and
+onboarding
+friction;
+improved
+supplier
+responsiveness;
+better initial
+risk hygiene. 
+Supplier
+master,
+category
+requirements,
+certifications/
+ESG ratings,
+risk feeds and
+identity
+validation. 
+Supplier
+portal,
+third‑party
+ESG/risk APIs,
+S2P supplier
+record
+creation, MDM.
+Med
+Production (data
+feeds); Prototype (NL
+discovery)
+Coupa NL vendor
+search & supplier
+inquiry agent
+(reported). 
+EcoVadis API. 
+50
+32
+51
+52
+32
+53
+5354
+55
+32
+44
+7
+
+Subprocess
+Agentic AI use
+cases (specific)
+Expected
+benefits
+Required
+inputs/data
+Integration
+points (typical)
+ComplexityMaturity
+Example vendors /
+sources
+RFx
+1) RFx authoring
+agent: generate
+RFI/RFP/RFQ drafts
+and supplier-
+specific
+questionnaires;
+enforce templates.
+2) Response
+summarization
+agent: summarize
+and normalize
+supplier
+questionnaire
+responses. 3) Bid
+analysis agent:
+compare bids
+including total cost
+trade-offs. 
+Reduced cycle
+time; higher
+consistency;
+improved
+evaluation
+quality; less
+manual
+reading. 
+Templates/
+playbooks,
+specs/SOWs,
+historic RFx,
+supplier
+catalogs,
+pricing/terms,
+logistics and
+payment
+terms. 
+RFx module,
+sourcing
+optimization
+engine, ERP
+item master,
+collaboration
+portal. 
+Med
+Prototype→Production
+SAP documented
+GA timing for bid
+analysis and
+supplier-response
+summary (Q1
+2026). 
+Negotiation
+1) Tail-spend
+negotiation agent:
+execute bounded
+negotiations (price
+list updates,
+renewals) within
+policy thresholds;
+escalate
+exceptions. 2)
+Negotiation
+monitoring agent:
+flag stalled
+negotiations and
+recommend next
+steps. 
+Scales
+negotiations to
+“long tail”;
+cycle-time
+reduction;
+improved
+terms; frees
+senior
+negotiators for
+strategic deals
+(but with
+relationship
+risks). 
+Supplier
+segmentation,
+negotiation
+playbooks,
+historical
+outcomes,
+approval
+thresholds,
+relationship
+notes, risk
+constraints. 
+Email/portal
+comms, CLM,
+sourcing suite,
+approval
+workflow,
+audit logs. 
+High
+Prototype→Production
+(select segments)
+Pactum case series
+(benefits and
+challenges). 
+Oracle sourcing
+agentic app
+examples
+(monitoring/
+recommendations).
+56
+56
+57
+58
+56
+59
+60
+61
+62
+42
+25
+8
+
+Subprocess
+Agentic AI use
+cases (specific)
+Expected
+benefits
+Required
+inputs/data
+Integration
+points (typical)
+ComplexityMaturity
+Example vendors /
+sources
+Contracting
+1) Contract
+drafting/redlining
+copilot agent with
+clause library +
+playbooks. 2)
+Obligation
+extraction and
+“contract Q&A” for
+operational users.
+3) Renewal/expiry
+agent: prompts
+owners, drafts
+renewal packages. 
+Faster cycle
+time; fewer
+template
+errors;
+improved
+compliance and
+post-signature
+visibility. 
+Clause library,
+playbooks/
+fallbacks, risk
+policies,
+metadata
+(jurisdiction/
+category),
+executed
+contracts
+corpus. 
+CLM, e-
+signature,
+sourcing suite,
+ERP PO/
+contract
+linkage. 
+Med
+Production (copilots)
+→ Prototype (more
+autonomy)
+Icertis “agentic AI
+across lifecycle.” 
+ SAP notes
+integration with
+Icertis for
+contracts. 
+Procurement
+(requesting,
+guided
+buying,
+intake)
+1)
+Intake→requisition
+agent: turn free-
+text requests/SOW
+into structured
+requests and route
+for approval. 2)
+Self-service
+assistant: answer
+“where is my
+request/PO?” and
+execute
+navigation/
+transactions. 
+Reduced
+“missing data”
+stalls; faster
+throughput;
+improved
+requester
+experience. 
+Catalogs,
+budgets,
+policies,
+approver
+matrices,
+supplier/
+contract
+context, SOW
+docs. 
+Intake
+management,
+procurement
+portal, ERP
+requisition
+APIs, identity/
+role systems. 
+Low→Med
+Production
+SAP intake mgmt
+and embedded
+assistant claims. 
+ ServiceNow
+procurement
+engagement layer
+positioning. 
+Purchase
+order
+1) R2PO agent:
+suggest
+categories/prices,
+create PO drafts,
+chase overdue
+POs, recommend
+alternates. 2) PO
+compliance agent:
+validate PO vs
+contract terms
+before release. 
+Faster PO
+creation; fewer
+errors;
+improved
+compliance to
+negotiated
+terms. 
+Item/service
+master,
+contract
+pricing,
+preferred
+suppliers,
+approvals,
+lead times/
+receipts. 
+ERP
+procurement
+APIs, S2P suite
+PO module,
+supplier portal,
+notifications. 
+Med
+Prototype→Production
+Oracle “Intelligent
+Procurement
+Agent” description
+(R2PO assistance). 
+63
+64
+65
+66
+38
+67
+68
+69
+70
+71
+72
+27
+73
+73
+74
+75
+76
+9
+
+Subprocess
+Agentic AI use
+cases (specific)
+Expected
+benefits
+Required
+inputs/data
+Integration
+points (typical)
+ComplexityMaturity
+Example vendors /
+sources
+Invoice
+processing
+1) Invoice
+ingestion agent:
+route documents,
+extract fields,
+validate
+confidence,
+request missing
+data. 2) Match &
+exception agent:
+2/3‑way match;
+propose
+resolution; collect
+evidence for
+approver. 
+Higher straight-
+through
+processing;
+fewer data
+entry errors;
+shorter cycle. 
+Invoices (PDF/
+image/e-
+invoice), PO,
+receipt/
+service entry,
+vendor
+master, tax
+rules. 
+IDP/OCR, AP
+workflow, ERP
+invoice APIs, e-
+invoicing
+network
+formats. 
+MedProduction
+ABBYY defines IDP
+> OCR and notes
+logging benefits. 
+ Oracle
+payables agent
+example
+(classification/
+extraction/
+matching). 
+UiPath case
+metrics show
+touchless targets
+achieved in
+practice. 
+Payment
+1) “OK-to-pay”
+agent: confirm
+policy checks,
+exceptions, and
+approvals;
+assemble payment
+run packages. 2)
+Payment anomaly
+agent: flag
+suspicious
+patterns; route for
+review. 
+Reduced late
+payments;
+fewer payment
+errors;
+improved fraud
+detection (with
+strict SoD
+controls). 
+Approved
+invoices,
+bank/vendor
+master,
+payment
+terms, fraud
+rules, audit
+evidence. 
+ERP/AP
+payment runs,
+treasury/bank
+interfaces,
+approvals,
+logging. 
+High
+Prototype→Production
+S2P suites define
+“payments” as a
+common feature;
+automation
+vendors describe
+payment exception
+mgmt and fraud
+detection patterns.
+Supplier
+management
+1) Supplier
+onboarding agent:
+validate identity,
+prefill registration,
+detect duplicates,
+chase missing
+docs. 2) Supplier
+workbench agent:
+consolidate tasks
+and respond to
+routine inquiries. 
+Faster
+onboarding;
+better master-
+data quality;
+fewer supplier
+tickets. 
+Supplier
+registration
+data, KYC/KYB
+docs, tax/
+bank details,
+certifications. 
+Supplier
+portal, ERP
+vendor master,
+third-party
+validation/risk
+APIs. 
+Med
+Production (validation
+feeds); Prototype
+(autonomous chasing)
+D&B integration
+described for
+supplier workflows
+in SAP context. 
+Coupa supplier
+portal automation
+described in
+reporting. 
+77
+49
+78
+79
+48
+25
+30
+80
+8180
+80
+80
+82
+83
+84
+84
+46
+32
+10
+
+Subprocess
+Agentic AI use
+cases (specific)
+Expected
+benefits
+Required
+inputs/data
+Integration
+points (typical)
+ComplexityMaturity
+Example vendors /
+sources
+Compliance
+1) Policy
+compliance agent:
+enforce preferred
+suppliers,
+thresholds, SoD;
+block/route
+exceptions with
+rationale. 2) E-
+invoicing
+compliance agent:
+validate format/
+rules and route via
+networks (where
+required). 
+Fewer audit
+findings;
+reduced
+maverick
+spend; higher
+e-invoicing
+correctness—
+only if controls
+and logging are
+robust. 
+Policies,
+approval
+matrices, tax
+rules, e-
+invoice specs,
+logs and
+evidence
+packs. 
+ERP controls,
+GRC tooling, e-
+invoicing
+gateways;
+comprehensive
+logging per
+regulatory
+expectations. 
+High
+Prototype→Production
+(bounded)
+EU AI Act
+highlights logging/
+traceability,
+documentation,
+human oversight,
+robustness/
+cybersecurity for
+high-risk AI. 
+Peppol BIS billing
+specification aligns
+to EN 16931 CIUS
+framing. 
+Analytics
+1) Spend
+classification +
+narrative agent:
+generate
+explanations,
+anomalies, and
+opportunity
+narratives with
+evidence links. 2)
+Process copilot
+agent: answer KPI
+questions and
+trigger
+orchestrated
+actions based on
+process context. 
+Better insight-
+to-action; faster
+reporting;
+improved
+bottleneck
+detection. 
+Event logs,
+spend cube,
+supplier KPIs,
+master data
+quality
+signals,
+process
+models. 
+Process mining
+connectors,
+data
+warehouse,
+orchestration
+engine, ERP/
+S2P APIs. 
+MedProduction
+Celonis system
+card describes
+agentic planning
+over tools and
+knowledge models;
+release notes show
+structured outputs
+and orchestration
+integration. 
+Observations and cross-subprocess patterns
+The strongest evidence for production-grade agentic patterns today is concentrated where (a) workflows
+already have structured data and (b) action space can be bounded: invoice ingestion/matching, guided
+buying/intake, RFx summarization/bid analysis, and process copilots generating structured outputs for
+downstream orchestration. 
+In contrast, “full autonomy” in negotiation and payment is inherently higher risk because it can directly
+affect   supplier   relationships   and   financial   controls;   even   documented   pilots   emphasize   relationship-
+management challenges and the need to balance automation with human interaction. 
+85
+86
+87
+88
+89
+90
+91
+92
+92
+93
+18
+94
+95
+11
+
+Risks, governance, auditability, and regulatory considerations
+Agentic AI changes risk posture because failures are no longer limited to incorrect text—they can become
+incorrect actions. Research explicitly calls out “hallucination in action,” infinite loops, and prompt injection
+as key open challenges when agents operate in open-ended environments and consume untrusted content.
+Key risk categories in S2P and recommended controls
+Risk category
+How it shows up in
+S2P agents
+Control and governance
+mitigations (practical)
+Supporting standards/
+authorities
+Unauthorized or
+incorrect
+transactions
+Agent creates/
+changes suppliers,
+POs, invoices, or
+approvals
+incorrectly
+Tool allow-lists; explicit
+“commit” steps; mandatory
+approvals by role;
+segregation of duties; dual
+control for master data/
+bank changes; transaction-
+level audit logs and
+replayable traces
+EU AI Act emphasizes
+logging/traceability,
+documentation, human
+oversight, cybersecurity/
+accuracy for high-risk AI
+systems.  SOC 2 is
+designed to report
+controls relevant to
+security/availability/
+processing integrity/
+confidentiality/privacy. 
+Prompt injection /
+data poisoning via
+documents
+Supplier emails,
+PDFs, portals
+inject instructions
+(“ignore policy...”)
+Content sandboxing;
+stripping executable
+instructions; retrieval
+grounding from trusted
+repositories; “policy-first”
+interpreters; isolation of
+untrusted content; red-
+team tests focused on tool
+abuse
+Agentic AI security risk is
+highlighted in research
+(prompt injection and risks
+amplified by tool
+interaction). 
+Hallucination and
+unverifiable
+recommendations
+Agent fabricates
+supplier
+capabilities,
+contract clauses,
+or compliance
+claims
+Evidence-linked outputs;
+“cite-and-check”
+requirement; deterministic
+validation against ERP/
+contract metadata; tie
+recommendations to
+structured fields;
+confidence thresholds that
+trigger escalation
+ReAct demonstrates
+grounding via actions/tool
+calls improves
+interpretability and
+reduces hallucination in
+knowledge tasks. 
+9
+89
+96
+16
+97
+12
+
+Risk category
+How it shows up in
+S2P agents
+Control and governance
+mitigations (practical)
+Supporting standards/
+authorities
+Model drift and
+inconsistent
+behavior across
+time
+Changes in
+suppliers, policies,
+tax rules lead to
+stale actions
+Continuous monitoring;
+versioning of prompts/
+tools/policies; golden test
+suites per subprocess;
+periodic approval of policy
+packs; process telemetry-
+based monitoring
+NIST AI RMF defines
+GOVERN/MAP/MEASURE/
+MANAGE functions and
+emphasizes lifecycle risk
+management. 
+Privacy and data
+leakage
+Supplier bank
+details, pricing,
+contract terms
+exposed via
+prompts or logs
+Data minimization; role-
+based access; encryption;
+redaction in prompts/logs;
+tenant isolation; secure
+key management;
+contractual controls with
+vendors
+SOC 2 trust criteria and
+controls apply to service
+orgs handling customer
+data. 
+Regulatory non-
+compliance
+AI outputs not
+traceable; lack of
+documentation;
+insufficient human
+oversight
+Maintain technical
+documentation, logs, and
+human-oversight evidence;
+compliance-by-design; AI
+governance system
+ISO ISO/IEC 42001
+specifies requirements for
+an AI management system
+to manage AI risks and
+governance.  EU AI Act
+timeline and obligations
+include logging,
+documentation, and
+human oversight for high-
+risk AI. 
+Governance operating model
+A governance design that withstands audit typically combines: - AI risk management lifecycle aligned to
+NIST’s   GOVERN/MAP/MEASURE/MANAGE;   in   practice   this   means   defining   accountability   and   policies
+(GOVERN), documenting intended use and contexts (MAP), measuring performance and risks (MEASURE),
+and implementing mitigations and monitoring (MANAGE). 
+-  Management system approach (ISO/IEC 42001) for organizational policies, risk treatment, and continual
+improvement for AI-based systems. 
+-  Audit-ready evidence: immutable logs of tool calls, inputs, outputs, approvals, and system state changes.
+This is consistent with the EU AI Act’s emphasis on logging/traceability and documentation for regulated
+classes of AI systems. 
+-  Clarity on “what needs agentic AI”: Gartner’s caution about agent washing implies governance should
+require a justification for autonomy level and why simpler automation/assistants are insufficient. 
+Regulatory posture notes
+The EU AI Act entered into force in 2024 and becomes broadly applicable in 2026 with phased timelines; it
+specifies strict obligations for high-risk AI systems (risk management, data quality, logging, documentation,
+98
+99
+96
+100
+101
+89
+102
+101
+89
+5
+13
+
+human oversight, robustness/cybersecurity/accuracy) and introduces transparency obligations for certain
+AI uses.  While most S2P use cases are not explicitly enumerated as “high-risk” categories on their own,
+S2P agent deployments can still fall under strict enterprise compliance expectations  due to their
+financial impact, audit requirements, and potential to affect access to services, especially when coupled with
+identity, credit-like risk scoring, or public-sector constraints. 
+On e-invoicing compliance, structured interoperability specifications matter. For example, the Peppol BIS
+Billing specification is framed as a CIUS of EN 16931 and aims to facilitate electronic collaboration around
+billing—relevant where enterprises must exchange documents via such networks or aligned standards. 
+Prioritized roadmap from pilot to scale
+Two constraints dominate successful scaling: (1) integration and data readiness and (2) operational risk
+controls. This matches Gartner’s advice to pursue agentic AI only where it delivers clear value and to
+recognize integration into legacy systems can be complex and costly.    It also aligns with APQC’s
+observation that P2P bottlenecks persist when requests lack details and invoice information mismatches
+stall payments—precisely the friction points agents can address if data and guardrails are strong. 
+Prioritized pilot candidates
+The following ranking balances value and feasibility while maintaining strong control points (bounded
+actions, explicit approvals, and measurable KPIs).
+PriorityUse case clusterWhy it’s prioritizedKey KPIs (examples)
+1
+Invoice ingestion +
+match/exception
+agent
+Clear volume-driven ROI; mature
+IDP + matching patterns;
+measurable straight-through
+processing; bounded actions with
+approval gates. 
+% touchless invoices; avg
+invoice cycle time; exception
+rate; rework hours;
+duplicate/overpayment
+leakage
+2
+Intake-to-
+requisition
+structuring +
+routing
+Removes “missing info” bottlenecks;
+improves requester UX; actions are
+routable and auditable. 
+% complete requests at first
+pass; intake cycle time;
+requester satisfaction; policy
+compliance rate
+3
+RFx summarization
++ bid analysis agent
+High analyst time savings; bounded
+to decision support with auditable
+outputs; explicit GA timelines exist
+for some capabilities. 
+RFx cycle time; evaluator
+hours per event; scoring
+consistency; bid comparison
+accuracy
+4
+Contract
+intelligence copilot
++ renewal agent
+High strategic value; needs strong
+governance and clause libraries;
+best when integrated into CLM
+rather than ad hoc. 
+Contract cycle time; clause
+deviation rate; obligation
+extraction precision; renewal
+leakage
+89
+88
+103
+8
+104
+105
+106
+56
+63
+14
+
+PriorityUse case clusterWhy it’s prioritizedKey KPIs (examples)
+5
+Supplier
+onboarding
+validation/
+enrichment
+Data quality foundation for
+downstream automation; needs
+careful SoD and master-data
+controls. 
+Onboarding cycle time;
+duplicate supplier rate;
+missing KYC doc rate;
+supplier ticket volume
+6
+Tail-spend
+negotiation
+autonomy
+Potentially large savings at scale but
+higher relationship/control risk;
+requires mature guardrails and
+supplier change management. 
+Negotiations per FTE;
+savings vs baseline; supplier
+satisfaction; escalation rate;
+cycle time
+Pilot-to-scale timeline
+gantt
+  title Pilot-to-scale roadmap for agentic AI in S2P
+  dateFormat  YYYY-MM-DD
+  axisFormat  %b %Y
+  section Foundation
+  Data inventory, access controls, logging design     :a1, 2026-04-15, 45d
+  Process telemetry (event logs / mining baseline)   :a2, 2026-04-15, 60d
+  AI governance (policies, risk register, approvals) :a3, 2026-04-15, 60d
+  section Pilot 1 (High ROI, bounded)
+  Invoice ingestion + match/exception agent          :b1, 2026-06-01, 90d
+  Pilot validation + audit dry-run                   :b2, after b1, 30d
+  section Pilot 2 (Front door)
+  Intake-to-requisition structuring + routing        :c1, 2026-07-15, 90d
+  section Expand (Multi-agent orchestration)
+  RFx summarization + bid analysis                   :d1, 2026-09-01, 90d
+  Contract intelligence copilot + renewals           :d2, 2026-10-01, 120d
+  section Scale
+  Supplier onboarding enrichment + risk monitoring   :e1, 2027-01-01, 120d
+  Tail-spend negotiation (select categories)         :e2, 2027-03-01, 120d
+This sequencing reflects: (a) Gartner’s caution to pursue clear ROI and avoid hype-driven deployments, (b)
+the need to mature data/process layers to close the “technology vs operating model” gap, and (c) APQC-
+observed bottlenecks where missing request details and invoice mismatches delay payments. 
+Roadmap table with success criteria, resourcing, and costs
+Costs are highly context-specific and vendor-dependent. Public sources do indicate that some suites use
+usage-based pricing models (e.g., token-based AI pricing noted in analyst discussion of at least one major
+84
+107
+108
+15
+
+suite), which increases the importance of usage monitoring and unit-cost KPIs.  Where costs cannot be
+responsibly estimated from sources, they are marked Unspecified.
+Phase
+Timeline
+target
+Scope
+deliverables
+Success criteria
+(minimum)
+Core resources
+Estimated
+costs
+Readiness6–10 weeks
+Data inventory
+(supplier/PO/
+invoice/
+contract); tool
+allow-list;
+identity/role
+mapping;
+logging + replay
+design; baseline
+process metrics
+via telemetry/
+process mining. 
+Audit trail
+demonstrably
+captures tool
+calls +
+approvals;
+baseline KPIs
+agreed; risk
+register and
+“autonomy
+levels” defined
+per use case. 
+Procurement
+SME, AP lead, IT
+integration lead,
+security, internal
+audit, data
+engineer, product
+owner
+Unspecified
+(depends
+on current
+tooling)
+Pilot 110–16 weeks
+Invoice
+ingestion +
+matching
+exception agent
+with human
+approval gates;
+IDP confidence
+thresholds;
+exception
+playbooks. 
+≥20–30%
+reduction in
+manual
+touches in pilot
+scope or
+measurable
+cycle-time
+reduction with
+no increase in
+error leakage;
+audit dry-run
+passes. 
+AP ops,
+automation
+engineer, ERP
+analyst, vendor/
+implementation
+partner, QA, audit
+liaison
+Unspecified
+(license +
+integration
++ run costs)
+Pilot 2
+10–16 weeks
+(overlapping)
+Intake-to-
+requisition
+conversion
+(docs/SOW →
+structured
+request),
+routing,
+requester
+assistant for
+status. 
+≥25%
+reduction in
+“incomplete
+request”
+rework; shorter
+approval
+routing time;
+improved
+requester CSAT.
+Procurement
+ops, intake
+platform admin,
+IAM, change
+management
+lead
+Unspecified
+109
+110
+111
+105
+112
+113114
+16
+
+Phase
+Timeline
+target
+Scope
+deliverables
+Success criteria
+(minimum)
+Core resources
+Estimated
+costs
+Expand3–6 months
+RFx
+summarization +
+bid analysis;
+contract copilot
+integrated with
+CLM; process
+copilot outputs
+integrated into
+orchestration
+steps with
+structured
+schemas. 
+RFx cycle time
+reduced;
+contract cycle
+time reduced
+or compliance
+improved;
+“agent outputs”
+are evidence-
+linked and
+reproducible. 
+Sourcing lead,
+legal/CLM admin,
+process
+intelligence lead,
+prompt/tooling
+engineer
+Unspecified
+Scale6–12 months
+Supplier
+onboarding
+enrichment with
+third-party
+verification;
+continuous risk
+monitoring;
+selective
+autonomous
+negotiation for
+tail categories
+with strict
+escalation. 
+Supplier
+master quality
+improves
+(duplicate
+reduction);
+negotiated
+savings in
+targeted
+segments
+without
+supplier
+satisfaction
+degradation;
+governance
+metrics stable. 
+Supplier mgmt
+lead, risk/
+compliance,
+vendor mgmt,
+CoE model risk
+owner, supplier
+communications
+Unspecified
+Implementation notes that materially affect outcomes
+First, data and process fragmentation are a primary blocker. SAP explicitly frames “AI only delivers value
+when supported by the right data, processes, and platform architecture,” and Gartner similarly frames
+integration and data-flow across S2P artifacts as key to visibility and execution. 
+Second, treat agentic AI as a portfolio of autonomy levels, not a binary. Gartner explicitly recommends
+using agents when decisions are needed, automation for routine workflows, and assistants for simple
+retrieval—reinforcing a layered approach rather than forcing “agentic” everywhere. 
+Third,   maximize   auditability   by   design.   Platforms   that   generate   structured   outputs   (schemas)   for
+downstream orchestration reduce brittleness and improve repeatability, which is foundational for controls
+and audit evidence in S2P. 
+115
+116
+117
+118
+119
+5
+120
+17
+
+Agentic Artificial Intelligence (AI): Architectures, Taxonomies, and Evaluation of Large
+Language Model Agents
+https://arxiv.org/pdf/2601.12560
+lp.ziphq.com
+https://lp.ziphq.com/rs/195-QFD-187/images/eBook_Gartner_Magic_Quradrant_Source_to_Pay_Suites.pdf?version=0
+SAP Discovery Center AI Feature - SAP Ariba Solutions, Joule
+https://www.sap.com/use-cases/complete-procurement-tasks-faster-with-joule
+Gartner Predicts Over 40% of Agentic AI Projects Will Be Canceled by End of 2027
+https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-
+be-canceled-by-end-of-2027
+ReAct: Synergizing Reasoning and Acting in Language Models
+https://arxiv.org/abs/2210.03629?utm_source=chatgpt.com
+Toolformer: Language Models Can Teach Themselves to Use Tools
+https://arxiv.org/abs/2302.04761?utm_source=chatgpt.com
+Reflexion: Language Agents with Verbal Reinforcement Learning
+https://arxiv.org/abs/2303.11366?utm_source=chatgpt.com
+AI Agents vs. Agentic AI: A Conceptual taxonomy, applications and challenges - ScienceDirect
+https://www.sciencedirect.com/science/article/pii/S1566253525006712
+AI in Procurement Orchestration: Transforming Workflows in 2026 | Ivalua
+https://www.ivalua.com/blog/ai-in-procurement-orchestration/
+Generative AI in Procurement 2025 - The Hackett Group®
+https://www.thehackettgroup.com/insights/embracing-the-future-how-generative-ai-is-revolutionizing-procurement-in-2025/
+System Card: Celonis Process Copilot
+https://docs.celonis.com/en/system-card--celonis-process-copilot.html
+AI Act | Shaping Europe’s digital future
+https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+Next‑Gen SAP Ariba: Intelligent Procurement | SAP News Center
+https://news.sap.com/2026/03/next-gen-sap-ariba-foundation-for-intelligent-procurement/
+Innovation Guide H2 2025
+https://www.sap.com/topics/innovation-guide/h2
+Oracle AI for Fusion Applications | Oracle India
+https://www.oracle.com/in/applications/fusion-ai/
+Procurement Service Management - ServiceNow
+https://www.servicenow.com/in/products/procurement-service-management.html
+Procure to Pay Agentic Automation | UiPath
+https://www.uipath.com/solutions/department/finance-and-accounting-automation/procure-to-pay
+How Technology Enables a Tiered Procure-to-Pay Service Delivery Model | APQC
+https://www.apqc.org/resource-library/resource-listing/how-technology-enables-tiered-procure-pay-service-delivery-model
+17916
+2461720295152748085109110
+36994
+5823108
+102697116
+11
+12
+13
+143536
+15
+189192
+1943868889
+216667687172119
+2240565758115
+242578
+2728
+3081100112
+31104106114
+18
+
+Coupa adds agentic AI features to spend management platform
+https://www.digitalcommerce360.com/2025/12/01/coupa-agentic-ai-features-procurement-platform/
+Dun & Bradstreet Integration with SAP Ariba Supplier ...
+https://help.sap.com/docs/strategic-sourcing/supplier-management-setup-and-administration/integrating-sap-ariba-supplier-
+lifecycle-and-performance-with-dun-bradstreet?utm_source=chatgpt.com
+Icertis: AI-Native Contract Management Software | Icertis
+https://www.icertis.com/
+Pactum’s AI in Contract Negotiations: Walmart and Maersk |
+Thunderbird
+https://thunderbird.asu.edu/thought-leadership/journals-case-series/case-series-listing/pactums-ai-contract-negotiations
+What is EcoVadis API, and how does it work – EcoVadis Help Center
+https://support.ecovadis.com/hc/en-us/articles/15133065925650-What-is-EcoVadis-API-and-how-does-it-work
+Supplier Risk Management | Monitor & Mitigate Supply Risk
+https://www.dnb.co.in/risk-management-solutions/supply-management-solutions/supplier-risk-management?
+utm_source=chatgpt.com
+Intelligent document processing platform | ABBYY Vantage
+https://www.abbyy.com/vantage/
+Icertis Contract Management | Icertis
+https://www.icertis.com/products/operate/contract-lifecycle-management/
+Built Using Fusion AI Agent Studio : Intelligent Procurement Agent — Cloud Customer Connect
+https://community.oracle.com/customerconnect/discussion/913324/built-using-fusion-ai-agent-studio-intelligent-procurement-
+agent
+Peppol BIS Billing
+https://docs.peppol.eu/poacc/billing/3.0/bis/
+March 2026 Release Notes
+https://docs.celonis.com/en/march-2026-release-notes.html
+SOC 2® - SOC for Service Organizations: Trust Services Criteria | AICPA & CIMA
+https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2
+nvlpubs.nist.gov
+https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf
+ISO/IEC 42001:2023 - AI management systems
+https://www.iso.org/standard/42001
+3233375053557082113
+34468384117
+38394763
+4142596061629598107118
+4454
+45
+48497779105
+6465
+737576
+8790103
+93120
+96
+99102111
+101
+19
